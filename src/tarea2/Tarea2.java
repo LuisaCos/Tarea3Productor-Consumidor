@@ -8,8 +8,8 @@ package tarea2;
  *
  * @author Usuario
  */
-public class Tarea2 {
-
+public class Tarea2 extends javax.swing.JFrame{
+    
     /**
      * @param args the command line arguments
      */
