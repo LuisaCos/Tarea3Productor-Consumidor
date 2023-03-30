@@ -8,6 +8,8 @@ import static java.lang.Thread.sleep;
 import java.util.concurrent.Semaphore;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.LinkedList;
+import java.util.Queue;
 
 /**
  *
@@ -19,10 +21,9 @@ public class Tarea3 extends javax.swing.JFrame {
     String[]consumidor = {"A","B","C","D","E"};
     int valor = 0; //contador del espacio libre para productores
     int letra; //El máximo de consumidos que pueden haber
-    private Semaphore mutex = new Semaphore(1,true); //exclusión mutua (1 solo proceso accede)
-    /*private int i = 0, j=0;
-    private Semaphore datos = new Semaphore(0,true); //existen datos en el contador
-    private Semaphore espacio; //el productor lo usa para saber si hay espacio.
+    private Semaphore Prod = new Semaphore(1); //exclusión mutua (1 solo proceso accede)
+    private Semaphore Cons = new Semaphore(0,true); //existen datos en el contador
+    /*private Semaphore espacio; //el productor lo usa para saber si hay espacio.
     */
 
     /**
@@ -34,6 +35,40 @@ public class Tarea3 extends javax.swing.JFrame {
         setLocationRelativeTo(null);
     }
 
+    public class buffer{
+        public static void main (String args[]){
+            Queue<Integer> q = new LinkedList<>();
+            for (int i = 0; i < 50; i++){
+                q.add(i);
+            }
+        }
+            
+    }
+    
+    
+    void get(){
+            try {
+                //antes de consumir valores
+                Cons.acquire();
+            } catch (InterruptedException ex) {
+                Logger.getLogger(Tarea3.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            
+            //después de consumir valores
+            Prod.release();
+    }
+    
+    void agregar (int valor){
+        //antes de agregar un valor
+        try {
+            Prod.acquire();
+        } catch (InterruptedException ex) {
+            Logger.getLogger(Tarea3.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        this.valor = valor;
+        //después de agregar un valor
+        Cons.release();
+    }
     
     public class productor extends Thread{
        boolean vacío;
@@ -42,12 +77,11 @@ public class Tarea3 extends javax.swing.JFrame {
          public productor(){
             this.vacío= true;
             this.lleno=false;
-            valor = 0;
         }
          
          @Override
     public void run(){
-        while(valor != 50){
+        for (int i = 0; i < 50; i++){
             //imprime los datos en los jlabel
             jContador.setText(""+valor++);
             if(valor == 1){
@@ -70,20 +104,8 @@ public class Tarea3 extends javax.swing.JFrame {
                 jConsumidor.setText("I");
             }else if (valor == 10){
                 jConsumidor.setText("J");
-            }else if(valor == 50){
-                try {
-                    sleep(1000);
-                } catch (InterruptedException ex) {
-                    Logger.getLogger(Tarea3.class.getName()).log(Level.SEVERE, null, ex);
-                }
             }
-            try {
-                mutex.acquire(); //protección a región crítica
-            } catch (InterruptedException ex) {
-                Logger.getLogger(Tarea3.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            mutex.release();
-        }
+        } 
     }
 }
     
@@ -101,12 +123,6 @@ public class Tarea3 extends javax.swing.JFrame {
         while(valor >= 10){
             //imprime los datos en los jlabel
             jConsumidor.setText(""+ (valor-10));
-            try {
-                mutex.acquire(); //protección a región crítica
-            } catch (InterruptedException ex) {
-                Logger.getLogger(Tarea3.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            mutex.release();
         }
       }
     }
