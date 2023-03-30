@@ -4,19 +4,114 @@
  */
 package tarea2;
 
+import static java.lang.Thread.sleep;
+import java.util.concurrent.Semaphore;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 /**
  *
  * @author Usuario
  */
 public class Tarea3 extends javax.swing.JFrame {
+    //región crítica
+    int[] productor = {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50};
+    String[]consumidor = {"A","B","C","D","E"};
+    int valor = 0; //contador del espacio libre para productores
+    int letra; //El máximo de consumidos que pueden haber
+    private Semaphore mutex = new Semaphore(1,true); //exclusión mutua (1 solo proceso accede)
+    /*private int i = 0, j=0;
+    private Semaphore datos = new Semaphore(0,true); //existen datos en el contador
+    private Semaphore espacio; //el productor lo usa para saber si hay espacio.
+    */
 
     /**
      * Creates new form Tarea3
      */
+    
     public Tarea3() {
         initComponents();
+        setLocationRelativeTo(null);
     }
 
+    
+    public class productor extends Thread{
+       boolean vacío;
+       boolean lleno;
+       
+         public productor(){
+            this.vacío= true;
+            this.lleno=false;
+            valor = 0;
+        }
+         
+         @Override
+    public void run(){
+        while(valor != 50){
+            //imprime los datos en los jlabel
+            jContador.setText(""+valor++);
+            if(valor == 1){
+                jConsumidor.setText("A");
+            }else if (valor == 2){
+                jConsumidor.setText("B");
+            }else if (valor == 3){
+                jConsumidor.setText("C");
+            }else if (valor == 4){
+                jConsumidor.setText("D");
+            }else if (valor == 5){
+                jConsumidor.setText("E");
+            }else if (valor == 6){
+                jConsumidor.setText("F");
+            }else if (valor == 7){
+                jConsumidor.setText("G");
+            }else if (valor == 8){
+                jConsumidor.setText("H");
+            }else if (valor == 9){
+                jConsumidor.setText("I");
+            }else if (valor == 10){
+                jConsumidor.setText("J");
+            }else if(valor == 50){
+                try {
+                    sleep(1000);
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(Tarea3.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+            try {
+                mutex.acquire(); //protección a región crítica
+            } catch (InterruptedException ex) {
+                Logger.getLogger(Tarea3.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            mutex.release();
+        }
+    }
+}
+    
+    public class consumidor extends Thread{
+        boolean vacío;
+       boolean lleno;
+       
+         public consumidor(){
+            this.vacío= true;
+            this.lleno=false;
+        }
+         
+         @Override
+        public void run(){
+        while(valor >= 10){
+            //imprime los datos en los jlabel
+            jConsumidor.setText(""+ (valor-10));
+            try {
+                mutex.acquire(); //protección a región crítica
+            } catch (InterruptedException ex) {
+                Logger.getLogger(Tarea3.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            mutex.release();
+        }
+      }
+    }
+    
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -26,58 +121,80 @@ public class Tarea3 extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jLabel1 = new javax.swing.JLabel();
-        jLabel2 = new javax.swing.JLabel();
-        jButton1 = new javax.swing.JButton();
-        jButton2 = new javax.swing.JButton();
+        jContador = new javax.swing.JLabel();
+        jConsumidor = new javax.swing.JLabel();
+        buttonIniciarProd = new javax.swing.JButton();
+        buttonConsumidor = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        jLabel1.setFont(new java.awt.Font("Yu Gothic", 1, 36)); // NOI18N
-        jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel1.setText("0");
+        jContador.setFont(new java.awt.Font("Yu Gothic", 1, 36)); // NOI18N
+        jContador.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jContador.setText("0");
 
-        jLabel2.setFont(new java.awt.Font("Yu Gothic", 1, 36)); // NOI18N
-        jLabel2.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel2.setText("?");
+        jConsumidor.setFont(new java.awt.Font("Yu Gothic", 1, 36)); // NOI18N
+        jConsumidor.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jConsumidor.setText("?");
 
-        jButton1.setText("Iniciar productores");
+        buttonIniciarProd.setText("Iniciar productores");
+        buttonIniciarProd.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                buttonIniciarProdActionPerformed(evt);
+            }
+        });
 
-        jButton2.setText("Iniciar consumidores");
+        buttonConsumidor.setText("Iniciar consumidor");
+        buttonConsumidor.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                buttonConsumidorActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(80, 80, 80)
-                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(94, 94, 94))
+                .addGap(21, 21, 21)
+                .addComponent(jContador, javax.swing.GroupLayout.PREFERRED_SIZE, 160, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 39, Short.MAX_VALUE)
+                .addComponent(jConsumidor, javax.swing.GroupLayout.PREFERRED_SIZE, 162, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(31, 31, 31))
             .addGroup(layout.createSequentialGroup()
                 .addGap(41, 41, 41)
-                .addComponent(jButton1)
-                .addGap(58, 58, 58)
-                .addComponent(jButton2)
-                .addContainerGap(42, Short.MAX_VALUE))
+                .addComponent(buttonIniciarProd)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(buttonConsumidor)
+                .addGap(52, 52, 52))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(90, 90, 90)
+                .addContainerGap(39, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 85, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 85, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 29, Short.MAX_VALUE)
+                    .addComponent(jConsumidor, javax.swing.GroupLayout.PREFERRED_SIZE, 148, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jContador, javax.swing.GroupLayout.PREFERRED_SIZE, 148, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(44, 44, 44)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jButton1)
-                    .addComponent(jButton2))
-                .addGap(71, 71, 71))
+                    .addComponent(buttonIniciarProd)
+                    .addComponent(buttonConsumidor))
+                .addGap(45, 45, 45))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void buttonIniciarProdActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonIniciarProdActionPerformed
+        // TODO add your handling code here:
+        productor h = new productor();
+        h.start();
+    }//GEN-LAST:event_buttonIniciarProdActionPerformed
+
+    private void buttonConsumidorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonConsumidorActionPerformed
+        // TODO add your handling code here:
+        consumidor o = new consumidor();
+        o.start();
+    }//GEN-LAST:event_buttonConsumidorActionPerformed
 
     /**
      * @param args the command line arguments
@@ -115,9 +232,9 @@ public class Tarea3 extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
+    private javax.swing.JButton buttonConsumidor;
+    private javax.swing.JButton buttonIniciarProd;
+    private javax.swing.JLabel jConsumidor;
+    private javax.swing.JLabel jContador;
     // End of variables declaration//GEN-END:variables
 }
